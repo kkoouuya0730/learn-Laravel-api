@@ -24,10 +24,19 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'required|max:255',
             'content' => 'nullable|string',
-            'user_id' => 'required|exists:users,id'
+            'user_id' => 'required|exists:users,id',
+            'tag_ids' => 'array',
+            'tag_ids.*' => 'exists:tags,id',
         ]);
 
         $post = Post::create($data);
+
+        if(!empty(($data['tag_ids']))) {
+            $post->tags()->attach($data['tag_ids']);
+        }
+
+        $post->load(['user', 'tags']);
+
         return response()->json($post, 201);
     }
 
