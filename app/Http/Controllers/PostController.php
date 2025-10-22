@@ -12,7 +12,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('user')->get();
+        $posts = Post::with(['user', 'tags'])->get();
         return response()->json($posts);
     }
 
@@ -36,7 +36,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        $post->load('user');
+        $post->load(['user', 'tags']);
         return response()->json($post);
     }
 
