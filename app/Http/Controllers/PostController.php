@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 
+use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
+
+
 class PostController extends Controller
 {
     /**
@@ -19,15 +23,9 @@ class PostController extends Controller
     /**
      * 投稿作成
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
-        $data = $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'nullable|string',
-            'user_id' => 'required|exists:users,id',
-            'tag_ids' => 'array',
-            'tag_ids.*' => 'exists:tags,id',
-        ]);
+        $data = $request->validated();
 
         $post = Post::create($data);
 
@@ -52,12 +50,9 @@ class PostController extends Controller
     /**
      * 投稿更新
      */
-    public function update(Request $request, Post $post)
+    public function update(UpdatePostRequest $request, Post $post)
     {
-        $data = $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
         $post->update($data);
         return response()->json($post);

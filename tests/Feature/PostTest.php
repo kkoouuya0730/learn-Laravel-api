@@ -74,4 +74,105 @@ class PostTest extends TestCase
         $this->assertDatabaseMissing('posts', ['id' => $post->id]);
     }
 
+    #[Test]
+    public function タイトルが空の場合はバリデーションエラーになる()
+    {
+        $user = User::factory()->create();
+        $tags = Tag::factory()->count(2)->create();
+
+        $response = $this->postJson('/api/posts', [
+            'title' => '',
+            'content' => '内容',
+            'user_id' => $user->id,
+            'tag_ids' => $tags->pluck('id')->toArray(),
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['title'])
+            ->assertJsonFragment(['title' => ['タイトルは必須です。']]);
+    }
+
+    #[Test]
+    public function 存在しないユーザーIDの場合はバリデーションエラーになる()
+    {
+        $tags = Tag::factory()->count(2)->create();
+
+        $response = $this->postJson('/api/posts', [
+            'title' => 'テストタイトル',
+            'content' => '内容',
+            'user_id' => 9999,
+            'tag_ids' => $tags->pluck('id')->toArray(),
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['user_id'])
+            ->assertJsonFragment(['user_id' => ['指定されたユーザーが存在しません。']]);
+
+    }
+
+    #[Test]
+    public function ユーザーIDが指定されていない場合はバリデーションエラーになる()
+    {
+        $tags = Tag::factory()->count(2)->create();
+
+        $response = $this->postJson('/api/posts', [
+            'title' => 'テストタイトル',
+            'content' => '内容',
+            'user_id' => null,
+            'tag_ids' => $tags->pluck('id')->toArray(),
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['user_id'])
+            ->assertJsonFragment(['user_id' => ['ユーザーIDは必須です。']]);
+    }
+
+    #[Test]
+    public function タグが配列でない場合にバリデーションエラーになる()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->postJson('/api/posts', [
+            'title' => 'テストタイトル',
+            'content' => '内容',
+            'user_id' => $user->id,
+            'tag_ids' => 'not-array',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['tag_ids'])
+            ->assertJsonFragment(['tag_ids' => ['タグは配列で指定してください。']]);
+    }
+
+    #[Test]
+    public function 存在しないタグがある場合にバリデーションエラーになる()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->postJson('/api/posts', [
+            'title' => 'テストタイトル',
+            'content' => '内容',
+            'user_id' => $user->id,
+            'tag_ids' => [9999],
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['tag_ids.0'])
+            ->assertJsonFragment(['tag_ids.0' => ['存在しないタグが含まれています。']]);
+    }
+
+    #[Test]
+    public function PUTでタイトルが空の場合はバリデーションエラーになる()
+    {
+        $post = Post::factory()->create();
+
+        $response = $this->putJson("/api/posts/{$post->id}", [
+            'title' => '',
+            'content' => '内容',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['title'])
+            ->assertJsonFragment(['title' => ['タイトルは必須です。']]);
+    }
 }
