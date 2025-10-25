@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Rules\PostValidationRules;
 
 class StorePostRequest extends FormRequest
 {
@@ -21,12 +22,7 @@ class StorePostRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'title' => 'required|max:255',
-            'user_id' => 'required|exists:users,id',
-            'tag_ids' => 'array',
-            'tag_ids.*' => 'exists:tags,id',
-        ];
+        return PostValidationRules::store();
     }
 
     public function messages(): array

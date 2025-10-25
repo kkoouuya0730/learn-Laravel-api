@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Rules\PostValidationRules;
 
 class UpdatePostRequest extends FormRequest
 {
@@ -21,10 +22,7 @@ class UpdatePostRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'title' => 'required|max:255',
-            'content' => 'nullable|string',
-        ];
+        return PostValidationRules::update();
     }
 
     public function messages(): array

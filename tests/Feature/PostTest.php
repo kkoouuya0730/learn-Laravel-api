@@ -37,7 +37,7 @@ class PostTest extends TestCase
             'tag_ids' => $tags->pluck('id')->toArray(),
         ]);
 
-        $response->assertStatus(201)->assertJsonFragment(['title' => 'テスト投稿']);
+        $response->assertStatus(201)->assertJsonFragment(['title' => 'テスト投稿', 'content' => '内容']);
     }
 
     #[Test]
