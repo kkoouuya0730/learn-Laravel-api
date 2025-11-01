@@ -30,8 +30,6 @@ class StorePostRequest extends FormRequest
         return [
             'title.required' => 'タイトルは必須です。',
             'title.max' => 'タイトルは255文字以内で入力してください。',
-            'user_id.required' => 'ユーザーIDは必須です。',
-            'user_id.exists' => '指定されたユーザーが存在しません。',
             'tag_ids.array' => 'タグは配列で指定してください。',
             'tag_ids.*.exists' => '存在しないタグが含まれています。',
         ];

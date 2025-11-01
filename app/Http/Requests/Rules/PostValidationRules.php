@@ -21,7 +21,6 @@ class PostValidationRules
   public static function store(): array
   {
     return array_merge(self::base(), [
-      'user_id' => ['required', 'exists:users,id'],
       'tag_ids' => ['array'],
       'tag_ids.*' => ['exists:tags,id'],
     ]);

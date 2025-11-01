@@ -25,6 +25,8 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         $data = $request->validated();
+        // カレントユーザーのidを設定
+        $data['user_id'] = auth()->id();
 
         $post = Post::create($data);
 
