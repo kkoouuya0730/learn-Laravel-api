@@ -26,7 +26,6 @@ class PostValidationRulesTest extends TestCase
         $expected = [
             'title' => ['required', 'max:255'],
             'content' => ['nullable', 'string'],
-            'user_id' => ['required', 'exists:users,id'],
             'tag_ids' => ['array'],
             'tag_ids.*' => ['exists:tags,id'],
         ];

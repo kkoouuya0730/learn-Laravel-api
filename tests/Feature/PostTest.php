@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\Attributes\Test;
 
 use Tests\TestCase;
@@ -30,6 +31,9 @@ class PostTest extends TestCase
         $user = User::factory()->create();
         $tags = Tag::factory()->count(2)->create();
 
+        // 認証ユーザーとしてリクエストを実行
+        Sanctum::actingAs($user);
+
         $response = $this->postJson('/api/posts', [
             'title' => 'テスト投稿',
             'content' => '内容',
@@ -53,7 +57,11 @@ class PostTest extends TestCase
     #[Test]
     public function 投稿を更新できる()
     {
+        $user = User::factory()->create();
         $post = Post::factory()->create();
+
+        // 認証ユーザーとしてリクエストを実行
+        Sanctum::actingAs($user);
 
         $response = $this->putJson("/api/posts/{$post->id}", [
             'title' => '更新後のタイトル',
@@ -66,7 +74,11 @@ class PostTest extends TestCase
     #[Test]
     public function 投稿を削除できる()
     {
+        $user = User::factory()->create();
         $post = Post::factory()->create();
+
+        // 認証ユーザーとしてリクエストを実行
+        Sanctum::actingAs($user);
 
         $response = $this->deleteJson("/api/posts/{$post->id}");
 
@@ -79,6 +91,9 @@ class PostTest extends TestCase
     {
         $user = User::factory()->create();
         $tags = Tag::factory()->count(2)->create();
+
+        // 認証ユーザーとしてリクエストを実行
+        Sanctum::actingAs($user);
 
         $response = $this->postJson('/api/posts', [
             'title' => '',
@@ -93,44 +108,12 @@ class PostTest extends TestCase
     }
 
     #[Test]
-    public function 存在しないユーザーIDの場合はバリデーションエラーになる()
-    {
-        $tags = Tag::factory()->count(2)->create();
-
-        $response = $this->postJson('/api/posts', [
-            'title' => 'テストタイトル',
-            'content' => '内容',
-            'user_id' => 9999,
-            'tag_ids' => $tags->pluck('id')->toArray(),
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['user_id'])
-            ->assertJsonFragment(['user_id' => ['指定されたユーザーが存在しません。']]);
-
-    }
-
-    #[Test]
-    public function ユーザーIDが指定されていない場合はバリデーションエラーになる()
-    {
-        $tags = Tag::factory()->count(2)->create();
-
-        $response = $this->postJson('/api/posts', [
-            'title' => 'テストタイトル',
-            'content' => '内容',
-            'user_id' => null,
-            'tag_ids' => $tags->pluck('id')->toArray(),
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['user_id'])
-            ->assertJsonFragment(['user_id' => ['ユーザーIDは必須です。']]);
-    }
-
-    #[Test]
     public function タグが配列でない場合にバリデーションエラーになる()
     {
         $user = User::factory()->create();
+
+        // 認証ユーザーとしてリクエストを実行
+        Sanctum::actingAs($user);
 
         $response = $this->postJson('/api/posts', [
             'title' => 'テストタイトル',
@@ -149,6 +132,9 @@ class PostTest extends TestCase
     {
         $user = User::factory()->create();
 
+        // 認証ユーザーとしてリクエストを実行
+        Sanctum::actingAs($user);
+
         $response = $this->postJson('/api/posts', [
             'title' => 'テストタイトル',
             'content' => '内容',
@@ -164,7 +150,11 @@ class PostTest extends TestCase
     #[Test]
     public function PUTでタイトルが空の場合はバリデーションエラーになる()
     {
+        $user = User::factory()->create();
         $post = Post::factory()->create();
+
+        // 認証ユーザーとしてリクエストを実行
+        Sanctum::actingAs($user);
 
         $response = $this->putJson("/api/posts/{$post->id}", [
             'title' => '',
